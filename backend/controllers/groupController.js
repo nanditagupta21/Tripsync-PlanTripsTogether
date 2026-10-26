@@ -1,6 +1,6 @@
 const Group = require("../models/Group");
+const { getTransportCost } = require("../utils/transportCosts");
 
-// Destination data with rich metadata
 const DESTINATIONS = [
   {
     name: "Rishikesh",
@@ -11,6 +11,7 @@ const DESTINATIONS = [
     tags: ["Adventure", "Spiritual", "Nature"],
     highlights: ["White water rafting", "Yoga & meditation", "Camping", "Bungee jumping"],
     bestFor: "Adventure seekers on a tight budget",
+    transportCost: { train: 800, bus: 500, road: 600, flight: 3500 },
     hotels: [
       { name: "Rishikesh Riverside Camp", price: 1200, image: "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=400" },
       { name: "Ganga View Lodge", price: 1800, image: "https://images.unsplash.com/photo-1470770903676-69b98201ea1c?w=400" },
@@ -26,6 +27,7 @@ const DESTINATIONS = [
     tags: ["Heritage", "Culture", "Food"],
     highlights: ["Amber Fort", "Hawa Mahal", "Local bazaars", "Rajasthani cuisine"],
     bestFor: "Culture lovers seeking royal experiences",
+    transportCost: { train: 1200, bus: 900, road: 1000, flight: 4000 },
     hotels: [
       { name: "Pink City Heritage Hotel", price: 3500, image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400" },
       { name: "Rajputana Palace Inn", price: 5000, image: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=400" },
@@ -41,6 +43,7 @@ const DESTINATIONS = [
     tags: ["Beaches", "Nightlife", "Water Sports"],
     highlights: ["Calangute Beach", "Old Goa churches", "Water sports", "Seafood"],
     bestFor: "Groups wanting beaches and nightlife",
+    transportCost: { train: 2500, bus: 2000, road: 3000, flight: 5500 },
     hotels: [
       { name: "Beachside Paradise Resort", price: 5500, image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400" },
       { name: "Palm Grove Beach Hotel", price: 7000, image: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=400" },
@@ -56,6 +59,7 @@ const DESTINATIONS = [
     tags: ["Mountains", "Snow", "Adventure"],
     highlights: ["Rohtang Pass", "Solang Valley", "Snow activities", "Old Manali"],
     bestFor: "Mountain lovers and snow enthusiasts",
+    transportCost: { train: 1500, bus: 1200, road: 1800, flight: 6000 },
     hotels: [
       { name: "Snow Valley Cottages", price: 2500, image: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400" },
       { name: "Himalayan Heights Hotel", price: 4000, image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400" },
@@ -71,6 +75,7 @@ const DESTINATIONS = [
     tags: ["Backwaters", "Nature", "Wellness"],
     highlights: ["Alleppey backwaters", "Munnar tea gardens", "Ayurvedic spa", "Kathakali shows"],
     bestFor: "Nature & wellness seekers",
+    transportCost: { train: 2000, bus: 1800, road: 2500, flight: 5000 },
     hotels: [
       { name: "Backwater Houseboat", price: 6000, image: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=400" },
       { name: "Munnar Tea Estate Stay", price: 4500, image: "https://images.unsplash.com/photo-1502784444187-359ac186c5bb?w=400" },
@@ -78,6 +83,8 @@ const DESTINATIONS = [
     ],
   },
 ];
+
+const VALID_MODES = ["train", "bus", "road", "flight"];
 
 // @desc    Create a new group
 // @route   POST /api/groups
@@ -141,7 +148,7 @@ const getGroup = async (req, res) => {
 // @access  Private
 const addMember = async (req, res) => {
   try {
-    const { name, city, budget } = req.body;
+    const { name, city, budget, travelMode = "train" } = req.body;
 
     if (!name || !city || budget === undefined) {
       return res.status(400).json({ success: false, message: "Name, city and budget are required" });
@@ -152,7 +159,21 @@ const addMember = async (req, res) => {
       return res.status(404).json({ success: false, message: "Group not found" });
     }
 
-    group.members.push({ name, city, budget: Number(budget) });
+    const VALID_MODES = ["train", "bus", "road", "flight"];
+
+if (!VALID_MODES.includes(travelMode)) {
+  return res.status(400).json({
+    success: false,
+    message: "Invalid travel mode",
+  });
+}
+
+group.members.push({
+  name,
+  city,
+  budget: Number(budget),
+  travelMode,
+});
     await group.save();
 
     res.status(201).json({ success: true, message: "Member added successfully", group });
@@ -183,62 +204,180 @@ const removeMember = async (req, res) => {
 };
 
 // @desc    Get best destinations for a group
-// @route   GET /api/groups/:id/destinations
+// @route   GET /api/groups/:id/destinations?travelMode=train
 // @access  Private
+
 const getBestDestinations = async (req, res) => {
   try {
-    const group = await Group.findOne({ _id: req.params.id, createdBy: req.user._id });
+    const group = await Group.findOne({
+      _id: req.params.id,
+      createdBy: req.user._id,
+    });
+
     if (!group) {
-      return res.status(404).json({ success: false, message: "Group not found" });
+      return res.status(404).json({
+        success: false,
+        message: "Group not found",
+      });
     }
 
     if (group.members.length === 0) {
-      return res.status(400).json({ success: false, message: "Add at least one member first" });
+      return res.status(400).json({
+        success: false,
+        message: "Add at least one member first",
+      });
     }
 
-    const avgBudget = group.avgBudget;
     const memberCount = group.members.length;
+    const avgBudget = group.avgBudget;
 
-    // Calculate trip duration in days
-    const diffTime = Math.abs(new Date(group.endDate) - new Date(group.startDate));
-    const tripDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) || 1;
+    const diffTime =
+      new Date(group.endDate) - new Date(group.startDate);
 
-    // Score and rank destinations
+    const tripDays = Math.max(
+      1,
+      Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+    );
+
     const scoredDestinations = DESTINATIONS.map((dest) => {
-      const totalCost = dest.costPerDay * tripDays * memberCount;
-      const costPerPerson = dest.costPerDay * tripDays;
+      // Calculate transport and trip costs separately for each member.
+      const memberCosts = group.members.map((member) => {
+        const requestedMode = member.travelMode || "train";
 
-      // Score: how close the budget matches
-      const budgetMatch =
-        avgBudget >= dest.budgetRange[0] && avgBudget <= dest.budgetRange[1];
-      const budgetDiff = Math.abs(avgBudget - (dest.budgetRange[0] + dest.budgetRange[1]) / 2);
-      const score = budgetMatch ? 100 - budgetDiff / 100 : 50 - budgetDiff / 200;
+        const travelMode = VALID_MODES.includes(requestedMode)
+          ? requestedMode
+          : "train";
+
+        // Existing estimates; these do not yet depend on origin city.
+        const transportResult = getTransportCost(
+            member.city,
+            dest.name,
+            travelMode,
+            dest.transportCost[travelMode]
+        );
+
+const transportCost = transportResult.cost;
+
+        const stayAndActivitiesCost = dest.costPerDay * tripDays;
+
+        const estimatedTotal = transportCost + stayAndActivitiesCost;
+
+        return {
+          memberId: member._id,
+          name: member.name,
+          city: member.city,
+          travelMode,
+          estimatedTransportCost: transportCost,
+          estimatedStayAndActivitiesCost: stayAndActivitiesCost,
+          estimatedTotal,
+          budget: member.budget,
+          withinBudget: estimatedTotal <= member.budget,
+        };
+      });
+
+      const totalTransportCost = memberCosts.reduce(
+        (sum, member) => sum + member.estimatedTransportCost,
+        0
+      );
+
+      const totalCost = memberCosts.reduce(
+        (sum, member) => sum + member.estimatedTotal,
+        0
+      );
+
+      const costPerPerson = Math.round(totalCost / memberCount);
+
+      const averageTransportCost = Math.round(
+        totalTransportCost / memberCount
+      );
+
+      const averageBudgetAfterTravel = Math.round(
+        memberCosts.reduce(
+          (sum, member) =>
+            sum + (member.budget - member.estimatedTransportCost),
+          0
+        ) / memberCount
+      );
+
+      // Calculate how well the estimated trip cost fits each member's budget.
+const budgetScores = memberCosts.map((member) => {
+  if (member.budget <= 0) {
+    return 0;
+  }
+
+  const budgetUsage = member.estimatedTotal / member.budget;
+
+  if (budgetUsage <= 1) {
+    // More remaining budget means a better budget match.
+    return Math.round((1 - budgetUsage * 0.5) * 100);
+  }
+
+  // The trip exceeds this member's budget, so reduce the score.
+  return Math.max(
+    0,
+    Math.round(50 - (budgetUsage - 1) * 100)
+  );
+});
+
+const score = Math.round(
+  budgetScores.reduce((sum, value) => sum + value, 0) /
+    budgetScores.length
+);
+
+      const affordable = memberCosts.every(
+        (member) => member.withinBudget
+      );
 
       return {
         ...dest,
         totalCost,
         costPerPerson,
+        transportCost: averageTransportCost,
+        totalTransportCost,
+        budgetAfterTravel: averageBudgetAfterTravel,
         tripDays,
         score: Math.max(0, Math.round(score)),
-        affordable: avgBudget >= dest.costPerDay * tripDays,
+        affordable,
+        memberCosts,
       };
     });
 
-    // Sort by score descending
-    scoredDestinations.sort((a, b) => b.score - a.score);
+    scoredDestinations.sort((a, b) => {
+      // Recommend destinations affordable for everyone first.
+      if (a.affordable !== b.affordable) {
+        return a.affordable ? -1 : 1;
+      }
 
-    res.json({
-      success: true,
-      avgBudget,
-      memberCount,
-      tripDays,
-      destinations: scoredDestinations,
-      groupName: group.groupName,
+      return b.score - a.score;
     });
+
+   
+res.json({
+  success: true,
+  avgBudget,
+  memberCount,
+  tripDays,
+  destinations: scoredDestinations,
+  groupName: group.groupName,
+  cities: group.members.map((member) => member.city),
+
+  // Send individual member details to the frontend
+  members: group.members.map((member) => ({
+    name: member.name,
+    city: member.city,
+    budget: member.budget,
+    travelMode: member.travelMode,
+  })),
+});
+
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
+
 
 // @desc    Delete a group
 // @route   DELETE /api/groups/:id

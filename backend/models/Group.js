@@ -1,10 +1,17 @@
 const mongoose = require("mongoose");
 
+
 const memberSchema = new mongoose.Schema({
   name: { type: String, required: true, trim: true },
   city: { type: String, required: true },
   budget: { type: Number, required: true, min: 0 },
+  travelMode: {
+    type: String,
+    enum: ["train", "bus", "road", "flight"],
+    default: "train",
+  },
 });
+
 
 const groupSchema = new mongoose.Schema(
   {

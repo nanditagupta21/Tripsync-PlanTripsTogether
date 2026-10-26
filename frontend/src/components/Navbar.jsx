@@ -42,7 +42,7 @@ const Navbar = () => {
               <MapPin size={20} className="text-white" />
             </div>
             <span className="font-bold text-lg text-gray-900">
-              Group<span className="text-blue-600">Trip</span>Finder
+            Trip<span className="text-blue-600">Sync</span>
             </span>
           </Link>
 

@@ -18,7 +18,12 @@ const AddMembersPage = () => {
   const [group, setGroup] = useState(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  const [form, setForm] = useState({ name: '', city: '', budget: '' });
+  const [form, setForm] = useState({
+  name: '',
+  city: '',
+  budget: '',
+  travelMode: 'train',
+  });
 
   const fetchGroup = async () => {
     try {
@@ -43,12 +48,18 @@ const AddMembersPage = () => {
     setSubmitting(true);
     try {
       const { data } = await api.post(`/groups/${id}/members`, {
-        name: form.name,
-        city: form.city,
-        budget: Number(form.budget),
+       name: form.name,
+       city: form.city,
+       budget: Number(form.budget),
+       travelMode: form.travelMode,
       });
       setGroup(data.group);
-      setForm({ name: '', city: '', budget: '' });
+      setForm({
+       name: '',
+       city: '',
+       budget: '',
+       travelMode: 'train',
+      });
       toast.success(`${form.name} added! 🎉`);
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to add member');
@@ -152,6 +163,29 @@ const AddMembersPage = () => {
                   </div>
                 </div>
 
+
+                
+<div>
+  <label className="label">Travel Mode *</label>
+  <select
+    className="input-field"
+    value={form.travelMode}
+    onChange={(e) =>
+      setForm({ ...form, travelMode: e.target.value })
+    }
+    required
+  >
+    <option value="train">Train</option>
+    <option value="bus">Bus</option>
+    <option value="road">Road Trip / Car</option>
+    <option value="flight">Flight</option>
+  </select>
+  <p className="text-xs text-gray-500 mt-1">
+    Select how this member will travel to the destination.
+  </p>
+</div>
+
+
                 <button type="submit" disabled={submitting} className="btn-primary w-full flex items-center justify-center gap-2">
                   {submitting ? (
                     <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -207,6 +241,8 @@ const AddMembersPage = () => {
                               <MapPin size={11} /> {member.city}
                               <span>·</span>
                               <IndianRupee size={11} /> ₹{member.budget.toLocaleString('en-IN')}
+                              <span>·</span>
+                              <span className="capitalize">{member.travelMode || 'train'}</span>
                             </div>
                           </div>
                         </div>

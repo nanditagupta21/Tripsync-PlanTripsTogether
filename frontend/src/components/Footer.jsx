@@ -10,7 +10,7 @@ const Footer = () => (
             <div className="bg-blue-600 p-2 rounded-xl">
               <MapPin size={18} className="text-white" />
             </div>
-            <span className="font-bold text-white text-lg">GroupTripFinder</span>
+            <span className="font-bold text-white text-lg">TripSync</span>
           </div>
           <p className="text-sm leading-relaxed">
             Helping groups from different cities find the most budget-friendly travel destination together.
@@ -41,14 +41,14 @@ const Footer = () => (
           <h4 className="text-white font-semibold mb-4">Contact</h4>
           <div className="flex items-center gap-2 text-sm mb-2">
             <Mail size={14} />
-            <span>support@grouptripfinder.com</span>
+            <span>support@tripsync.com</span>
           </div>
           <p className="text-sm">India 🇮🇳</p>
         </div>
       </div>
 
       <div className="border-t border-gray-800 mt-10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <p className="text-sm">© 2026 GroupTripFinder. All rights reserved.</p>
+        <p className="text-sm">© 2026 TripSync. All rights reserved.</p>
         <p className="text-sm flex items-center gap-1">Made with <Heart size={14} className="text-red-500" /> in India</p>
       </div>
     </div>
