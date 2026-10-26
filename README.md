@@ -1,113 +1,163 @@
-# 🗺️ GroupTripFinder
+# 🗺️ TripSync — Plan Trips Together
 
-A full-stack Group Trip Planner — React Vite + Tailwind CSS frontend, Express + MongoDB backend with MVC architecture.
+**An AI-powered full-stack group travel planner** that helps friends plan trips together based on their budgets, starting cities, and travel preferences.
+
+🌐 **Live Website:** https://tripsync-frontend-zc01.onrender.com/  
+💻 **GitHub Repository:** https://github.com/nanditagupta21/Tripsync-PlanTripsTogether
 
 ---
 
 ## 🚀 Tech Stack
 
-| Layer     | Technology                                     |
-|-----------|------------------------------------------------|
-| Frontend  | React 18, Vite, Tailwind CSS, React Router v6  |
-| Backend   | Node.js, Express 4, MongoDB, Mongoose          |
-| Auth      | JWT (jsonwebtoken) + bcryptjs password hashing |
-| HTTP      | Axios with interceptors                        |
-| Toasts    | react-hot-toast                                |
-| Icons     | lucide-react                                   |
+| Layer | Technology |
+|---|---|
+| Frontend | React 18, Vite, Tailwind CSS |
+| Backend | Node.js, Express.js |
+| Database | MongoDB, Mongoose |
+| Authentication | JWT, bcryptjs password hashing |
+| API Communication | Axios with interceptors |
+| AI Integration | Google Gemini API |
+| Notifications | react-hot-toast |
+| Icons | lucide-react |
+| Deployment | Render |
 
 ---
 
-## 📁 Project Structure
+## ✨ Features
 
-```
-group-trip-finder/
+- 🔐 **Secure Authentication** — User signup and login with JWT authentication and bcrypt password hashing.
+- 📧 **Duplicate Account Prevention** — Checks existing email addresses to prevent duplicate registrations.
+- 👥 **Group Trip Planning** — Create a group and add multiple members to plan a trip together.
+- 💰 **Budget-Based Recommendations** — Recommends destinations based on the group's average budget.
+- 🤖 **AI-Powered Trip Recommendations** — Uses Google Gemini to suggest destinations based on budget, starting cities, and travel preferences.
+- 🚆 **Member-Wise Travel Cost Estimates** — Provides approximate transportation cost breakdowns for group members travelling from different cities.
+- 🏝️ **Destination Suggestions** — Explore Indian destinations such as Goa, Jaipur, Rishikesh, Manali, and Kerala.
+- 🏨 **Hotel Recommendations** — Displays hotel suggestions for destinations.
+- 🗓️ **Trip Planning** — Supports trip dates and duration-based cost estimates.
+- 🔎 **Destination Matching** — Scores and ranks destinations based on budget suitability and preferences.
+- 🔒 **Protected Routes** — Restricts authenticated pages to logged-in users.
+- 📱 **Responsive Interface** — React-based interface designed for convenient trip planning.
+- 🔔 **Toast Notifications** — Provides feedback for actions such as signup, login, and group creation.
+
+---
+
+## 🧰 How TripSync Works
+
+1. **Create an account** or log in.
+2. **Create a trip group** and enter the trip details.
+3. **Add members** with their starting cities and budgets.
+4. **Choose travel preferences**, such as mountains, beaches, cafes, or adventure activities.
+5. **Get recommendations** based on the group details and AI-generated suggestions.
+6. **Compare estimated costs** and explore destinations to help plan the trip together.
+
+---
+
+## 🧠 Recommendation and Cost Logic
+
+### Budget-Based Destination Matching
+
+TripSync uses group budget information to help identify suitable destinations. Destination matching can consider the average group budget and the estimated destination cost.
+
+### AI-Powered Recommendations
+
+The backend sends the group's budget, starting cities, and preferences to the Google Gemini API. The AI generates destination suggestions with supporting details such as activities, approximate costs, and itinerary ideas.
+
+### Member-Wise Transportation Estimates
+
+Members may start their journeys from different cities. TripSync provides approximate transportation cost estimates to help the group understand how travel expenses may differ by member.
+
+> **Note:** Transportation costs and AI-generated budget estimates are indicative, not guaranteed live fares. Actual costs may vary depending on travel dates, availability, and transportation mode.
+
+---
+
+## 🏗️ Project Structure
+
+```text
+Tripsync-PlanTripsTogether/
 ├── backend/
 │   ├── config/
-│   │   └── db.js              # MongoDB connection
+│   │   └── db.js
 │   ├── controllers/
-│   │   ├── authController.js  # signup, login, getMe
-│   │   └── groupController.js # CRUD + destination logic
+│   │   ├── authController.js
+│   │   └── groupController.js
 │   ├── middleware/
-│   │   └── authMiddleware.js  # JWT protect middleware
+│   │   └── authMiddleware.js
 │   ├── models/
-│   │   ├── User.js            # User schema (bcrypt hashed)
-│   │   └── Group.js           # Group + members schema
+│   │   ├── User.js
+│   │   └── Group.js
 │   ├── routes/
 │   │   ├── authRoutes.js
-│   │   └── groupRoutes.js
-│   ├── server.js              # Express entry point
+│   │   ├── groupRoutes.js
+│   │   └── aiRoutes.js
+│   ├── utils/
+│   │   └── transportCosts.js
+│   ├── server.js
 │   ├── .env.example
 │   └── package.json
 │
 └── frontend/
     ├── src/
     │   ├── api/
-    │   │   └── axios.js           # Axios instance + interceptors
     │   ├── components/
-    │   │   ├── Navbar.jsx
-    │   │   ├── Footer.jsx
-    │   │   ├── Spinner.jsx
-    │   │   └── ProtectedRoute.jsx
     │   ├── context/
-    │   │   └── AuthContext.jsx    # Auth state + login/signup/logout
     │   ├── pages/
-    │   │   ├── HomePage.jsx       # Landing page
-    │   │   ├── LoginPage.jsx
-    │   │   ├── SignupPage.jsx
-    │   │   ├── DashboardPage.jsx
-    │   │   ├── CreateGroupPage.jsx
-    │   │   ├── AddMembersPage.jsx
-    │   │   └── ResultsPage.jsx
-    │   ├── App.jsx                # Router + layout
+    │   ├── App.jsx
     │   ├── main.jsx
-    │   └── index.css              # Tailwind + custom CSS
+    │   └── index.css
     ├── index.html
-    ├── vite.config.js
-    ├── tailwind.config.js
-    ├── postcss.config.js
     └── package.json
 ```
 
 ---
 
-## ⚙️ Setup & Run
+## ⚙️ Setup and Installation
 
 ### Prerequisites
-- Node.js 18+
-- MongoDB running locally (`mongod`) OR a MongoDB Atlas URI
 
----
+- Node.js and npm
+- MongoDB running locally or a MongoDB Atlas database
+- Google Gemini API key for AI recommendations
 
-### 1. Backend Setup
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/nanditagupta21/Tripsync-PlanTripsTogether.git
+cd Tripsync-PlanTripsTogether
+```
+
+### 2. Configure the Backend
 
 ```bash
 cd backend
 npm install
-
-# Copy env file and fill in your values
-cp .env.example .env
 ```
 
-Edit `.env`:
-```
+Create a `.env` file inside the `backend` directory:
+
+```env
 PORT=5000
-MONGO_URI=mongodb://localhost:27017/grouptripfinder
-JWT_SECRET=change_this_to_a_long_random_secret
+MONGO_URI=your_mongodb_connection_string
+JWT_SECRET=your_long_random_secret
+GEMINI_API_KEY=your_gemini_api_key
 ```
+
+Replace the placeholder values with your own credentials. Never commit your real `.env` file or API keys to GitHub.
+
+Start the backend:
 
 ```bash
-# Development (with auto-reload)
 npm run dev
+```
 
-# Production
+If you don't have a development script configured, use:
+
+```bash
 npm start
 ```
 
-Backend runs at: **http://localhost:5000**
+### 3. Configure the Frontend
 
----
-
-### 2. Frontend Setup
+Open a separate terminal:
 
 ```bash
 cd frontend
@@ -115,68 +165,71 @@ npm install
 npm run dev
 ```
 
-Frontend runs at: **http://localhost:5173**
+Open the local URL displayed by Vite, usually:
 
-> The Vite dev server proxies `/api` → `http://localhost:5000` automatically.
+http://localhost:5173/
 
 ---
 
 ## 🔌 API Endpoints
 
-### Auth
-| Method | Endpoint           | Access  | Description        |
-|--------|--------------------|---------|--------------------|
-| POST   | /api/auth/signup   | Public  | Register new user  |
-| POST   | /api/auth/login    | Public  | Login user         |
-| GET    | /api/auth/me       | Private | Get current user   |
+### Authentication
+
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | `/api/auth/signup` | Register a new user |
+| POST | `/api/auth/login` | Log in |
+| GET | `/api/auth/me` | Retrieve the authenticated user |
 
 ### Groups
-| Method | Endpoint                            | Access  | Description                  |
-|--------|-------------------------------------|---------|------------------------------|
-| GET    | /api/groups                         | Private | Get all user's groups        |
-| POST   | /api/groups                         | Private | Create a group               |
-| GET    | /api/groups/:id                     | Private | Get single group             |
-| DELETE | /api/groups/:id                     | Private | Delete a group               |
-| POST   | /api/groups/:id/members             | Private | Add member to group          |
-| DELETE | /api/groups/:id/members/:memberId   | Private | Remove member from group     |
-| GET    | /api/groups/:id/destinations        | Private | Get ranked destinations      |
+
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/api/groups` | Retrieve the user's groups |
+| POST | `/api/groups` | Create a group |
+| GET | `/api/groups/:id` | Retrieve a specific group |
+| DELETE | `/api/groups/:id` | Delete a group |
+| POST | `/api/groups/:id/members` | Add a group member |
+| DELETE | `/api/groups/:id/members/:memberId` | Remove a member |
+| GET | `/api/groups/:id/destinations` | Retrieve destination recommendations |
+
+### AI Recommendations
+
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | `/api/ai/recommend` | Generate AI-powered trip recommendations |
+
+Private endpoints require the appropriate authentication token. The AI endpoint expects trip information in the request body.
 
 ---
 
-## 🌏 Features
+## 🚀 Deployment
 
-- ✅ **JWT Auth** — Signup/Login with secure bcrypt hashed passwords
-- ✅ **MVC Backend** — Clean separation: Models → Controllers → Routes
-- ✅ **MongoDB** — Mongoose schemas with virtuals (avgBudget, memberCount)
-- ✅ **Smart Destinations** — 5 curated Indian destinations scored by avg budget
-- ✅ **Hotels** — 3 hotel recommendations per destination
-- ✅ **React + Tailwind** — Beautiful responsive UI with animations
-- ✅ **Protected Routes** — JWT-guarded pages in React
-- ✅ **Toast Notifications** — User-friendly feedback
-- ✅ **3-Step Wizard** — Create Group → Add Members → View Results
+TripSync is deployed on Render.
+
+- **Live application:** https://tripsync-frontend-zc01.onrender.com/
+- **Backend service:** Hosted on Render
+- **Database:** MongoDB
+
+The frontend communicates with the backend API, which handles authentication, group management, database operations, transportation estimates, and AI recommendations.
 
 ---
 
-## 🧠 Destination Scoring Logic
+## 🔮 Future Improvements
 
-The backend calculates:
-- **Trip duration** from start/end dates
-- **Average budget** across all members  
-- **Total cost** = `costPerDay × tripDays × memberCount`
-- **Score** = how well the avg budget fits the destination's budget range (0–100%)
-- Results sorted by score descending — best match shown first
-
----
-
-## 🛠 Production Build
-
-```bash
-cd frontend
-npm run build
-# Outputs to frontend/dist/
-# Serve dist/ with any static server or your Express backend
-```
+- Live flight, train, and bus fare integrations
+- Hotel booking API integration
+- Interactive maps and distance-based calculations
+- Collaborative itinerary editing
+- Group expense splitting
+- More personalized destination recommendations
 
 ---
 
-© 2026 GroupTripFinder
+## 👩‍💻 Project
+
+**TripSync — Plan Trips Together**
+
+A full-stack project focused on making group travel planning easier, more collaborative, and budget-conscious.
+
+© 2026 TripSync
